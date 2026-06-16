@@ -1,1 +1,299 @@
-#
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>KNM A2 Practice Questions + Exam Simulation</title>
+<style>
+  body { font-family: Arial, sans-serif; line-height: 1.55; margin: 0; background: #f6f7fb; color: #222; }
+  header { background: #0f3d5e; color: white; padding: 28px 20px; text-align: center; }
+  main { max-width: 1100px; margin: auto; padding: 24px; }
+  section { background: white; border-radius: 12px; padding: 24px; margin-bottom: 24px; box-shadow: 0 2px 10px rgba(0,0,0,.06); }
+  h1, h2, h3 { margin-top: 0; }
+  .note { background: #fff8df; border-left: 5px solid #e5b700; padding: 12px 16px; border-radius: 8px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 14px; }
+  .card { border: 1px solid #ddd; border-radius: 10px; padding: 14px; background: #fcfcff; }
+  .answer { font-weight: bold; color: #0b6b3a; }
+  .english { color: #555; }
+  button { background: #0f3d5e; color: white; border: 0; border-radius: 8px; padding: 10px 16px; cursor: pointer; margin: 6px 6px 6px 0; }
+  button:hover { background: #155983; }
+  button.secondary { background: #666; }
+  button.danger { background: #a52a2a; }
+  .timer { font-size: 1.5rem; font-weight: bold; color: #a52a2a; }
+  .question-box { border-top: 1px solid #ddd; padding-top: 18px; margin-top: 18px; }
+  .option { display: block; margin: 8px 0; padding: 10px; border: 1px solid #ddd; border-radius: 8px; cursor: pointer; }
+  .option input { margin-right: 8px; }
+  .correct { background: #dff5e8; border-color: #2e8b57; }
+  .wrong { background: #ffe1e1; border-color: #c33; }
+  .hidden { display: none; }
+  .summary { font-size: 1.1rem; font-weight: bold; }
+  table { width: 100%; border-collapse: collapse; margin-top: 12px; }
+  th, td { border: 1px solid #ddd; padding: 8px; vertical-align: top; }
+  th { background: #eef3f7; }
+  @media print { button, #examControls { display: none; } body { background: white; } section { box-shadow: none; } }
+</style>
+</head>
+<body>
+<header>
+  <h1>KNM A2 Practice Questions + Exam Simulation</h1>
+  <p>Kennis van de Nederlandse Maatschappij — Inburgering A2 preparation</p>
+</header>
+<main>
+<section>
+  <h2>Important exam format</h2>
+  <div class="note">
+    <p><strong>Official DUO information:</strong> KNM is a computer exam and lasts <strong>45 minutes</strong>.</p>
+    <p><strong>Simulation used here:</strong> 40 multiple-choice questions in 45 minutes. This is a practice simulation, not the real DUO exam paper.</p>
+  </div>
+</section>
+
+<section id="practice">
+  <h2>100 KNM Practice Questions with Answers and English Translation</h2>
+  <div class="grid" id="practiceGrid"></div>
+</section>
+
+<section id="simulation">
+  <h2>KNM Exam Simulation</h2>
+  <p>This simulation gives <strong>40 questions</strong> and a <strong>45-minute timer</strong>. Questions are in Dutch only, like exam practice. After submitting, you can review all answers.</p>
+  <div id="examControls">
+    <button onclick="startExam()">Start New Exam</button>
+    <button class="secondary" onclick="window.print()">Print / Save as PDF</button>
+  </div>
+  <p class="timer hidden" id="timer">45:00</p>
+  <form id="examForm" class="hidden"></form>
+  <button id="submitBtn" class="hidden" onclick="submitExam(event)">Submit Exam and Review</button>
+  <button id="resetBtn" class="hidden danger" onclick="resetExam()">Reset</button>
+  <div id="results"></div>
+</section>
+</main>
+<script>
+const practice = [
+{q:'Wat doe je als je verhuist?', a:'Je geeft je nieuwe adres door aan de gemeente.', en:'You report your new address to the municipality.'},
+{q:'Welk nummer bel je bij een noodgeval?', a:'112.', en:'112.'},
+{q:'Waarvoor ga je naar de huisarts?', a:'Voor medische klachten.', en:'For medical problems.'},
+{q:'Wie betaalt belasting?', a:'Iedereen met inkomen betaalt meestal belasting.', en:'Everyone with income usually pays taxes.'},
+{q:'Wat is leerplicht?', a:'Kinderen moeten naar school.', en:'Children must attend school.'},
+{q:'Mag een vrouw werken?', a:'Ja.', en:'Yes.'},
+{q:'Mag een man voor de kinderen zorgen?', a:'Ja.', en:'Yes.'},
+{q:'Wat doe je als je ziek bent en werkt?', a:'Je meldt je ziek bij je werkgever.', en:'You report sick to your employer.'},
+{q:'Wat doet UWV?', a:'UWV helpt bij werk en uitkeringen.', en:'UWV helps with jobs and benefits.'},
+{q:'Waar vraag je huurtoeslag aan?', a:'Bij de Belastingdienst.', en:'At the Tax Administration.'},
+{q:'Wat is een DigiD?', a:'Een digitale inlog voor overheidsdiensten.', en:'A digital login for government services.'},
+{q:'Mag je discrimineren?', a:'Nee.', en:'No.'},
+{q:'Wat is een afspraak?', a:'Een geplande ontmoeting.', en:'A planned meeting.'},
+{q:'Waarom moet je op tijd komen?', a:'Dat is belangrijk in Nederland.', en:'It is important in Dutch society.'},
+{q:'Wat doe je als je een afspraak niet kunt halen?', a:'Je belt af.', en:'You cancel and inform them.'},
+{q:'Mag je je eigen geloof kiezen?', a:'Ja.', en:'Yes.'},
+{q:'Wat betekent vrijheid van meningsuiting?', a:'Je mag je mening geven.', en:'You may express your opinion.'},
+{q:'Wie maakt wetten?', a:'Regering en parlement.', en:'Government and parliament.'},
+{q:'Wat is een zorgverzekering?', a:'Een verzekering voor medische zorg.', en:'Health insurance.'},
+{q:'Is een zorgverzekering verplicht?', a:'Ja.', en:'Yes.'},
+{q:'Wat doet een tandarts?', a:'Behandelt tanden.', en:'Treats teeth.'},
+{q:'Mag je stemmen?', a:'Als je aan de voorwaarden voldoet.', en:'If you meet the requirements.'},
+{q:'Wat is vrijwilligerswerk?', a:'Werk zonder salaris.', en:'Unpaid work.'},
+{q:'Waarom doen mensen vrijwilligerswerk?', a:'Om anderen te helpen.', en:'To help others.'},
+{q:'Wat is respect?', a:'Anderen goed behandelen.', en:'Treating others well.'},
+{q:'Wat doe je met afval?', a:'Scheiden waar mogelijk.', en:'Separate it when possible.'},
+{q:'Wat is de gemeente?', a:'De lokale overheid.', en:'The local government.'},
+{q:'Waar vraag je een paspoort aan?', a:'Bij de gemeente.', en:'At the municipality.'},
+{q:'Wat betekent gelijkheid?', a:'Iedereen heeft dezelfde rechten.', en:'Everyone has the same rights.'},
+{q:'Mag een vrouw alleen wonen?', a:'Ja.', en:'Yes.'},
+{q:'Mag je kritiek hebben op de overheid?', a:'Ja.', en:'Yes.'},
+{q:'Wat doe je als je werk zoekt?', a:'Solliciteren.', en:'Apply for jobs.'},
+{q:'Wat is een arbeidsovereenkomst?', a:'Een contract voor werk.', en:'Employment contract.'},
+{q:'Wat betekent bruto salaris?', a:'Salaris vóór belastingen.', en:'Salary before taxes.'},
+{q:'Wat betekent netto salaris?', a:'Salaris na belastingen.', en:'Salary after taxes.'},
+{q:'Wat is kinderopvang?', a:'Opvang voor kinderen.', en:'Childcare.'},
+{q:'Waarom leren kinderen Nederlands op school?', a:'Om goed mee te doen in de samenleving.', en:'To participate in society.'},
+{q:'Wat doe je als je post van de overheid krijgt?', a:'Lezen en reageren indien nodig.', en:'Read it and respond if needed.'},
+{q:'Wat is de Belastingdienst?', a:'De organisatie die belastingen regelt.', en:'The tax authority.'},
+{q:'Wat doet de politie?', a:'Zorgt voor veiligheid.', en:'Maintains safety.'},
+{q:'Mag je geweld gebruiken?', a:'Nee, behalve in noodweer.', en:'No, except self-defense.'},
+{q:'Wat betekent integratie?', a:'Meedoen in de samenleving.', en:'Participating in society.'},
+{q:'Wat is een bibliotheek?', a:'Een plek om boeken te lenen.', en:'A place to borrow books.'},
+{q:'Waarom leren mensen Nederlands?', a:'Voor werk en dagelijks leven.', en:'For work and daily life.'},
+{q:'Wat doe je als je werkloos bent?', a:'Werk zoeken en UWV contacteren.', en:'Look for work and contact UWV.'},
+{q:'Wat is een uitkering?', a:'Financiële ondersteuning.', en:'Financial support.'},
+{q:'Wat betekent democratie?', a:'Burgers hebben invloed via verkiezingen.', en:'Citizens influence government through elections.'},
+{q:'Wie betaalt de AOW?', a:'SVB.', en:'SVB.'},
+{q:'Wat is SVB?', a:'Sociale Verzekeringsbank.', en:'Social Insurance Bank.'},
+{q:'Waarom moet je je identificeren?', a:'Omdat dat soms wettelijk verplicht is.', en:'Because it is sometimes legally required.'},
+{q:'Wat is een huurwoning?', a:'Een woning die je huurt.', en:'A rented house.'},
+{q:'Wat is een koopwoning?', a:'Een woning die je koopt.', en:'A purchased house.'},
+{q:'Waarvoor gebruik je DigiD?', a:'Overheidszaken.', en:'Government services.'},
+{q:'Mag je zelf kiezen met wie je trouwt?', a:'Ja.', en:'Yes.'},
+{q:'Wat is discriminatie?', a:'Ongelijke behandeling.', en:'Unequal treatment.'},
+{q:'Mag discriminatie?', a:'Nee.', en:'No.'},
+{q:'Wat doet een school?', a:'Onderwijs geven.', en:'Provide education.'},
+{q:'Wat is kinderbijslag?', a:'Geld voor kinderen.', en:'Child benefit.'},
+{q:'Wat betekent werken in teamverband?', a:'Samenwerken.', en:'Working together.'},
+{q:'Waarom is op tijd komen belangrijk?', a:'Respect tonen.', en:'Showing respect.'},
+{q:'Wat doe je bij brand?', a:'Bel 112.', en:'Call 112.'},
+{q:'Wat is een ziekenhuis?', a:'Plaats voor medische behandeling.', en:'Hospital.'},
+{q:'Wat is een apotheek?', a:'Daar haal je medicijnen.', en:'Pharmacy.'},
+{q:'Wie schrijft medicijnen voor?', a:'Huisarts of specialist.', en:'Doctor or specialist.'},
+{q:'Mag je je mening geven?', a:'Ja.', en:'Yes.'},
+{q:'Wat betekent vrijheid van godsdienst?', a:'Eigen geloof kiezen.', en:'Choose your religion.'},
+{q:'Wat doet de rechter?', a:'Spreekt recht.', en:'Administers justice.'},
+{q:'Wat doet de rechtbank?', a:'Behandelt rechtszaken.', en:'Handles legal cases.'},
+{q:'Waarom betaal je belasting?', a:'Voor publieke voorzieningen.', en:'For public services.'},
+{q:'Wat is een cao?', a:'Collectieve arbeidsovereenkomst.', en:'Collective labor agreement.'},
+{q:'Wat is een vakbond?', a:'Organisatie voor werknemers.', en:'Workers\' union.'},
+{q:'Wat is pensioen?', a:'Inkomen na werkleven.', en:'Retirement income.'},
+{q:'Wat is een sollicitatiegesprek?', a:'Gesprek voor een baan.', en:'Job interview.'},
+{q:'Wat doe je als je te laat komt?', a:'Informeren en excuses aanbieden.', en:'Inform and apologize.'},
+{q:'Wat betekent verantwoordelijkheid?', a:'Verantwoord handelen.', en:'Acting responsibly.'},
+{q:'Wat is de Eerste Kamer?', a:'Deel van het parlement.', en:'Senate.'},
+{q:'Wat is de Tweede Kamer?', a:'Volksvertegenwoordiging.', en:'House of Representatives.'},
+{q:'Wie is het staatshoofd?', a:'De koning.', en:'The King.'},
+{q:'Wat doet de regering?', a:'Besturen van het land.', en:'Governs the country.'},
+{q:'Wat is een verkiezing?', a:'Kiezen van vertegenwoordigers.', en:'Election.'},
+{q:'Waarom stemmen mensen?', a:'Invloed hebben.', en:'To have influence.'},
+{q:'Wat is een buurthuis?', a:'Ontmoetingsplaats.', en:'Community center.'},
+{q:'Waarom sporten mensen?', a:'Gezondheid.', en:'Health.'},
+{q:'Wat betekent gezond leven?', a:'Goed eten en bewegen.', en:'Healthy eating and exercise.'},
+{q:'Wat is mantelzorg?', a:'Zorg voor een bekende.', en:'Informal care.'},
+{q:'Wat doe je met schulden?', a:'Hulp zoeken.', en:'Seek help.'},
+{q:'Wat is een bankrekening?', a:'Rekening voor geldzaken.', en:'Bank account.'},
+{q:'Waarom heb je een BSN nodig?', a:'Voor overheidszaken.', en:'For government services.'},
+{q:'Wat is BSN?', a:'Burgerservicenummer.', en:'Citizen Service Number.'},
+{q:'Wat betekent emancipatie?', a:'Gelijke kansen.', en:'Equal opportunities.'},
+{q:'Mag een vrouw scheiden?', a:'Ja.', en:'Yes.'},
+{q:'Mag een man thuisblijven voor de kinderen?', a:'Ja.', en:'Yes.'},
+{q:'Waarom is onderwijs belangrijk?', a:'Voor ontwikkeling en werk.', en:'For development and work.'},
+{q:'Wat doe je als je hulp nodig hebt?', a:'Vraag hulp.', en:'Ask for help.'},
+{q:'Wat betekent participatie?', a:'Actief meedoen.', en:'Active participation.'},
+{q:'Wat is een buurt?', a:'Gebied waar je woont.', en:'Neighborhood.'},
+{q:'Waarom is Nederlands leren belangrijk?', a:'Voor integratie.', en:'For integration.'},
+{q:'Wat betekent gelijkwaardigheid?', a:'Iedereen is evenveel waard.', en:'Everyone has equal value.'},
+{q:'Wat is een democratische samenleving?', a:'Burgers hebben rechten en invloed.', en:'Citizens have rights and influence.'},
+{q:'Wat is een belangrijke Nederlandse waarde?', a:'Vrijheid, gelijkheid en respect.', en:'Freedom, equality, and respect.'}
+];
+
+const examBank = [
+{q:'Je bent verhuisd. Wat moet je doen?', options:['De politie bellen','Je nieuwe adres doorgeven aan de gemeente','Niets doen'], correct:1},
+{q:'Bij levensgevaar bel je...', options:['112','UWV','De Belastingdienst'], correct:0},
+{q:'Waar vraag je huurtoeslag aan?', options:['Bij de Belastingdienst','Bij de tandarts','Bij de politie'], correct:0},
+{q:'Wat doet UWV?', options:['Helpt bij werk en uitkeringen','Geeft paspoorten','Behandelt tanden'], correct:0},
+{q:'Wat is verplicht in Nederland?', options:['Zorgverzekering','Een auto kopen','Vrijwilligerswerk doen'], correct:0},
+{q:'Je bent ziek en je kunt niet werken. Wat doe je?', options:['Je meldt je ziek bij je werkgever','Je blijft weg zonder bericht','Je belt de gemeente voor vakantie'], correct:0},
+{q:'Waar ga je heen met kiespijn?', options:['Tandarts','Gemeente','UWV'], correct:0},
+{q:'Wat betekent bruto salaris?', options:['Salaris vóór belastingen','Salaris na belastingen','Vakantiegeld'], correct:0},
+{q:'Wat betekent netto salaris?', options:['Salaris na belastingen','Salaris vóór belastingen','Geld van de gemeente'], correct:0},
+{q:'Mag discriminatie in Nederland?', options:['Nee','Ja','Alleen op het werk'], correct:0},
+{q:'Wat betekent vrijheid van meningsuiting?', options:['Je mag je mening geven','Je mag iedereen beledigen zonder gevolgen','Je moet altijd zwijgen'], correct:0},
+{q:'Wie maakt wetten in Nederland?', options:['Regering en parlement','Alleen de koning','Alleen de politie'], correct:0},
+{q:'Wat is DigiD?', options:['Digitale inlog voor overheidsdiensten','Een zorgverzekering','Een bankpas'], correct:0},
+{q:'Waar vraag je een paspoort aan?', options:['Bij de gemeente','Bij de apotheek','Bij UWV'], correct:0},
+{q:'Wat is leerplicht?', options:['Kinderen moeten naar school','Ouders moeten werken','Iedereen moet sporten'], correct:0},
+{q:'Mag een vrouw werken?', options:['Ja','Nee','Alleen met toestemming van de gemeente'], correct:0},
+{q:'Mag je zelf kiezen met wie je trouwt?', options:['Ja','Nee','Alleen de familie kiest'], correct:0},
+{q:'Wat doe je als je een afspraak niet kunt halen?', options:['Afzeggen of verzetten','Niet komen zonder bericht','De politie bellen'], correct:0},
+{q:'Waarom is op tijd komen belangrijk?', options:['Het toont respect','Het is niet belangrijk','Alleen op zondag'], correct:0},
+{q:'Wat doet de politie?', options:['Zorgt voor veiligheid','Betaalt huurtoeslag','Geeft onderwijs'], correct:0},
+{q:'Wie betaalt de AOW?', options:['SVB','Gemeente','Tandarts'], correct:0},
+{q:'Wat is de SVB?', options:['Sociale Verzekeringsbank','School voor volwassenen','Sportvereniging'], correct:0},
+{q:'Wat is vrijwilligerswerk?', options:['Werk zonder salaris','Werk met hoog salaris','Werk voor alleen kinderen'], correct:0},
+{q:'Waarom betaal je belasting?', options:['Voor publieke voorzieningen','Voor privévakantie','Voor gratis auto’s'], correct:0},
+{q:'Wat is een cao?', options:['Collectieve arbeidsovereenkomst','Computeradres overheid','Controle arts onderwijs'], correct:0},
+{q:'Wat is een vakbond?', options:['Organisatie voor werknemers','Organisatie voor tandartsen','Organisatie voor kinderen'], correct:0},
+{q:'Wat is pensioen?', options:['Inkomen na je werkleven','Kinderopvang','Een huurcontract'], correct:0},
+{q:'Wat doet een apotheek?', options:['Medicijnen geven','Paspoorten maken','Werk zoeken'], correct:0},
+{q:'Wie schrijft medicijnen voor?', options:['Huisarts of specialist','Gemeente','Werkgever'], correct:0},
+{q:'Wat is mantelzorg?', options:['Zorg voor iemand die je kent','Kinderopvang door de school','Betaalde zorgverzekering'], correct:0},
+{q:'Wat doe je met schulden?', options:['Hulp zoeken','Meer schulden maken','Brieven weggooien'], correct:0},
+{q:'Wat is een BSN?', options:['Burgerservicenummer','Bank Salaris Nummer','Belasting School Nummer'], correct:0},
+{q:'Waarom heb je een BSN nodig?', options:['Voor overheidszaken','Voor winkelen','Voor sport kijken'], correct:0},
+{q:'Wat betekent democratie?', options:['Burgers hebben invloed via verkiezingen','Alleen de koning beslist','Niemand mag stemmen'], correct:0},
+{q:'Wat is de Tweede Kamer?', options:['Volksvertegenwoordiging','Een ziekenhuis','Een schoollokaal'], correct:0},
+{q:'Wie is het staatshoofd van Nederland?', options:['De koning','De burgemeester','De huisarts'], correct:0},
+{q:'Wat betekent integratie?', options:['Meedoen in de samenleving','Alleen thuis blijven','Geen Nederlands leren'], correct:0},
+{q:'Waarom leren mensen Nederlands?', options:['Voor werk en dagelijks leven','Alleen voor vakantie','Omdat Engels verboden is'], correct:0},
+{q:'Wat doe je bij brand?', options:['Bel 112','Bel UWV','Bel de tandarts'], correct:0},
+{q:'Wat is gelijkwaardigheid?', options:['Iedereen is evenveel waard','Iedereen verdient hetzelfde salaris','Iedereen heeft hetzelfde huis'], correct:0},
+{q:'Wat is kinderbijslag?', options:['Geld voor kinderen','Geld voor vakantie','Geld voor pensioen'], correct:0},
+{q:'Wat is kinderopvang?', options:['Opvang voor kinderen','Werk voor ouderen','Belasting betalen'], correct:0},
+{q:'Wat is een huurwoning?', options:['Een woning die je huurt','Een woning die je koopt','Een woning van de tandarts'], correct:0},
+{q:'Wat is een koopwoning?', options:['Een woning die je koopt','Een woning die je huurt','Een kamer in een school'], correct:0},
+{q:'Wat doet een rechter?', options:['Spreekt recht','Geeft medicijnen','Betaalt salaris'], correct:0},
+{q:'Wat doet een rechtbank?', options:['Behandelt rechtszaken','Verkoopt huizen','Geeft sportles'], correct:0},
+{q:'Wat is een sollicitatiegesprek?', options:['Gesprek voor een baan','Gesprek met de tandarts','Gesprek over afval'], correct:0},
+{q:'Wat doe je als je te laat komt?', options:['Informeren en excuses aanbieden','Niets zeggen','Nooit meer komen'], correct:0},
+{q:'Wat is participatie?', options:['Actief meedoen','Alleen wonen','Niet stemmen'], correct:0},
+{q:'Wat is een belangrijke Nederlandse waarde?', options:['Vrijheid, gelijkheid en respect','Altijd alleen beslissen','Nooit kritiek geven'], correct:0}
+];
+let selectedExam = [];
+let timerInterval;
+let secondsLeft = 45 * 60;
+
+function renderPractice(){
+  const grid = document.getElementById('practiceGrid');
+  practice.forEach((item, i)=>{
+    const div = document.createElement('div');
+    div.className = 'card';
+    div.innerHTML = `<h3>${i+1}. ${item.q}</h3><p><span class="answer">Antwoord:</span> ${item.a}</p><p class="english"><strong>English:</strong> ${item.en}</p>`;
+    grid.appendChild(div);
+  });
+}
+function shuffle(arr){ return [...arr].sort(()=>Math.random()-0.5); }
+function startExam(){
+  resetExam(false);
+  selectedExam = shuffle(examBank).slice(0,40).map(item=>{
+    const opts = item.options.map((text, idx)=>({text, original:idx}));
+    const shuffled = shuffle(opts);
+    return {q:item.q, options:shuffled, correctOriginal:item.correct};
+  });
+  const form = document.getElementById('examForm');
+  form.innerHTML = '';
+  selectedExam.forEach((item, i)=>{
+    const box = document.createElement('div');
+    box.className = 'question-box';
+    box.innerHTML = `<h3>${i+1}. ${item.q}</h3>` + item.options.map((opt, j)=>
+      `<label class="option"><input type="radio" name="q${i}" value="${opt.original}"> ${String.fromCharCode(65+j)}. ${opt.text}</label>`
+    ).join('');
+    form.appendChild(box);
+  });
+  secondsLeft = 45*60;
+  document.getElementById('timer').classList.remove('hidden');
+  document.getElementById('examForm').classList.remove('hidden');
+  document.getElementById('submitBtn').classList.remove('hidden');
+  document.getElementById('resetBtn').classList.remove('hidden');
+  document.getElementById('results').innerHTML = '';
+  updateTimer();
+  timerInterval = setInterval(()=>{ secondsLeft--; updateTimer(); if(secondsLeft<=0){ submitExam(new Event('submit')); } },1000);
+}
+function updateTimer(){
+  const m = Math.floor(secondsLeft/60).toString().padStart(2,'0');
+  const s = (secondsLeft%60).toString().padStart(2,'0');
+  document.getElementById('timer').textContent = `${m}:${s}`;
+}
+function submitExam(e){
+  e.preventDefault();
+  clearInterval(timerInterval);
+  let score = 0;
+  let rows = '';
+  selectedExam.forEach((item, i)=>{
+    const chosen = document.querySelector(`input[name=q${i}]:checked`);
+    const chosenVal = chosen ? Number(chosen.value) : null;
+    const correctText = item.options.find(o=>o.original===item.correctOriginal).text;
+    const chosenText = chosen ? item.options.find(o=>o.original===chosenVal).text : 'Geen antwoord';
+    const ok = chosenVal === item.correctOriginal;
+    if(ok) score++;
+    rows += `<tr class="${ok?'correct':'wrong'}"><td>${i+1}</td><td>${item.q}</td><td>${chosenText}</td><td>${correctText}</td><td>${ok?'Goed':'Fout'}</td></tr>`;
+  });
+  const percentage = Math.round(score/selectedExam.length*100);
+  document.getElementById('results').innerHTML = `<p class="summary">Score: ${score}/${selectedExam.length} (${percentage}%).</p><p>Review your answers below.</p><table><thead><tr><th>#</th><th>Vraag</th><th>Jouw antwoord</th><th>Correct antwoord</th><th>Status</th></tr></thead><tbody>${rows}</tbody></table>`;
+  document.getElementById('submitBtn').classList.add('hidden');
+}
+function resetExam(clear=true){
+  clearInterval(timerInterval);
+  document.getElementById('timer').classList.add('hidden');
+  document.getElementById('examForm').classList.add('hidden');
+  document.getElementById('submitBtn').classList.add('hidden');
+  document.getElementById('resetBtn').classList.add('hidden');
+  if(clear){ document.getElementById('examForm').innerHTML=''; document.getElementById('results').innerHTML=''; }
+}
+renderPractice();
+</script>
+</body>
+</html>
